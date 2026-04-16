@@ -37,6 +37,35 @@ export function detectErrorType(trace: string): DetectedErrorType {
   return "generic";
 }
 
+/**
+ * Loose smell-check — returns false only when the input clearly isn't an error.
+ * Intentionally permissive: single-line errors, CORS messages, TS codes, etc.
+ * all pass. Only random short text or obvious non-errors fail.
+ */
+export function looksLikeError(trace: string): boolean {
+  const t = trace.trim();
+  if (t.length < 15) return false;
+
+  return [
+    /\bat\s+\w/,                                        // stack frame: "at foo"
+    /\b(Type|Syntax|Reference|Range|URI|Eval)Error\b/i,
+    /\berror:/i,
+    /\bexception:/i,
+    /TS\d{3,4}:/,                                       // TypeScript error code
+    /\.(js|ts|tsx|jsx|mjs|cjs):\d+/,                   // file:line reference
+    /cannot read prop/i,
+    /is not (defined|a function|assignable)/i,
+    /CORS|Access-Control/i,
+    /hydration failed/i,
+    /module not found/i,
+    /\bwarning:/i,
+    /failed to (fetch|load)/i,
+    /\buncaught\b/i,
+    /object is possibly/i,
+    /unexpected token/i,
+  ].some((p) => p.test(t));
+}
+
 export const ERROR_TYPE_LABELS: Record<DetectedErrorType, string> = {
   react: "React",
   typescript: "TypeScript",

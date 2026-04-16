@@ -34,6 +34,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
+                aria-hidden="true"
               >
                 <rect
                   x="1"
@@ -80,6 +81,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       >
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <DecoderShell
+            key={urlParams.get("t") ?? "default"}
             initialTrace={shared?.trace}
             initialResult={shared?.result}
           />

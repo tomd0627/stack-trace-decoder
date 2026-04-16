@@ -146,6 +146,14 @@ export function DecoderShell({
     []
   );
 
+  const handleClear = useCallback(() => {
+    setSections([]);
+    setStatus("idle");
+    setErrorMessage(null);
+    setCurrentTrace("");
+    bufferRef.current = "";
+  }, []);
+
   // Auto-decode when arriving from a share URL that has a trace but no cached result
   useEffect(() => {
     if (initialTrace && !initialResult) {
@@ -163,6 +171,7 @@ export function DecoderShell({
           initialTrace={initialTrace}
           status={status}
           onDecode={handleDecode}
+          onClear={handleClear}
         />
       </div>
 

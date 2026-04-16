@@ -17,6 +17,12 @@
     "react-dom": "^19.0.0",
     "server-only": "^0.0.1"
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ],
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.9.0",
     "@tailwindcss/postcss": "^4.0.0",

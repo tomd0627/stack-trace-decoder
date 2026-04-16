@@ -6,6 +6,7 @@ import {
   detectErrorType,
   ERROR_TYPE_COLORS,
   ERROR_TYPE_LABELS,
+  looksLikeError,
 } from "@/lib/detect-error-type";
 import type { DecodeStatus, DetectedErrorType } from "@/types";
 
@@ -15,11 +16,13 @@ interface TraceInputProps {
   initialTrace?: string;
   status: DecodeStatus;
   onDecode: (trace: string, errorType: DetectedErrorType) => void;
+  onClear: () => void;
 }
 
-export function TraceInput({ initialTrace, status, onDecode }: TraceInputProps) {
+export function TraceInput({ initialTrace, status, onDecode, onClear }: TraceInputProps) {
   const [trace, setTrace] = useState(initialTrace ?? "");
   const [detectedType, setDetectedType] = useState<DetectedErrorType>("generic");
+  const [showWarning, setShowWarning] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -38,6 +41,7 @@ export function TraceInput({ initialTrace, status, onDecode }: TraceInputProps) 
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const value = e.target.value.slice(0, MAX_CHARS);
       setTrace(value);
+      setShowWarning(false);
       autoResize();
 
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -67,16 +71,25 @@ export function TraceInput({ initialTrace, status, onDecode }: TraceInputProps) 
     e.preventDefault();
     const trimmed = trace.trim();
     if (!trimmed || isLoading) return;
+
+    if (!showWarning && !looksLikeError(trimmed)) {
+      setShowWarning(true);
+      return;
+    }
+
+    setShowWarning(false);
     onDecode(trimmed, detectErrorType(trimmed));
   }
 
   function handleClear() {
     setTrace("");
     setDetectedType("generic");
+    setShowWarning(false);
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.focus();
     }
+    onClear();
   }
 
   const charCount = trace.length;
@@ -118,12 +131,18 @@ export function TraceInput({ initialTrace, status, onDecode }: TraceInputProps) 
           autoCorrect="off"
           autoCapitalize="off"
           disabled={isLoading}
-          aria-label="Stack trace or error message"
           aria-describedby="char-count"
           className="w-full min-h-[220px] resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-2)] p-4 font-mono text-sm leading-relaxed text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition-colors focus:border-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-60"
           style={{ fontFamily: "var(--font-mono)" }}
         />
       </div>
+
+      {/* Validation warning */}
+      {showWarning && (
+        <p className="text-xs text-[var(--color-warning)]" role="alert">
+          This doesn&apos;t look like a stack trace. Click Decode again to try anyway.
+        </p>
+      )}
 
       {/* Footer row — detected type badge + char count + decode button */}
       <div className="flex items-center justify-between gap-3">

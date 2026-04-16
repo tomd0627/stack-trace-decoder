@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   // to bundle/trace it — it runs server-side only and has native deps.
   serverExternalPackages: ["@anthropic-ai/sdk"],
 
+  experimental: {
+    // Enable granular tree-shaking for icon libraries
+    optimizePackageImports: ["lucide-react"],
+  },
+
   async headers() {
     return [
       {
