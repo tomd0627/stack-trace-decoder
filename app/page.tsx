@@ -21,7 +21,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <main className="min-h-dvh flex flex-col">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+      <header className="sticky top-0 z-10 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
           <div className="flex items-center gap-3">
             {/* Terminal icon */}
